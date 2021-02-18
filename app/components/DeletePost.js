@@ -1,6 +1,6 @@
-import React, { Component } from 'react'
-import {Alert,View,Image,ImageBackground,Dimensions,Modal,Text,FlatList,TouchableOpacity, Button,StyleSheet, Linking ,I18nManager} from 'react-native';
-import { Content,Container, Right, Header, Left, Body} from 'native-base';
+import React, {useState, useEffect} from 'react';
+import {Alert,View,Image,ImageBackground,Dimensions,Modal,Text,FlatList,TouchableOpacity,StyleSheet, } from 'react-native';
+import {  Right, Header, Left, Body} from 'native-base';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import NetInfo from "@react-native-community/netinfo";
 import { Constant } from '../Global/Constant/Constant.js';
@@ -14,59 +14,59 @@ const guidelineBaseHeight = 680;
 const scale = size => (Dimensions.get("window").width / guidelineBaseWidth) * size;
 const moderateScale = (size, factor = 0.5) =>
   size + (scale(size) - size) * factor;
-const font_type = {
+ const font_type = {
     FontLight: 'Helvetica',
     FontBold : 'Helvetica-Bold'
 };
-const DeletePost =()=> {
+
+ const DeletePost = ({route,navigation}) => {
   const [progressVisible, setProgressVisible] = useState(false);
   const [visible, setVisible] = useState(false);
-  const [id, setId] = useState("");
+//  const [id, setId] = useState("");
   const [body, setBody] = useState(null);
   const [title, setTitle] = useState(" ");
-  const [progressVisible, setProgressVisible] = useState(" ");
-  const id = navigation.getParam('id');
-  useEffect(()=>{
-  console.log(id);
-     NetInfo.fetch().then(state => {
-      console.log("Connection type", state.type);
-      console.log("Is connected?", state.isConnected);
-      if(state.isConnected){
-      setProgressVisible(true)
-      fetch(Constant.BaseUrl+'posts/'+id, {
-      method: 'GET',
-      headers: {
-      Accept: 'application/json',
-      'Content-Type': 'application/json',
-      },
-      })
-      .then((response) => {
-      setProgressVisible(false)
-      if(response.status==200){
-      response.json()
-      .then((responseJson) => {
 
-          setId(responseJson.id)
-          setTitle(title),
-          setBody(responseJson.body)
+   const [id,setId] = useState(route.params.id);
+    useEffect(()=>{
+        console.log('---------'+id)
+        NetInfo.fetch().then(state => {
+        console.log("Connection type", state.type);
+        console.log("Is connected?", state.isConnected);
+        if(state.isConnected){
+        setProgressVisible(true)
 
-      setProgressVisible(false)
-      }).catch((error) =>
-      {
-      setProgressVisible(false)
-      console.error("error"+error);
-      }
-      );
-      }
-      })
-      }else{
-      alert('Could Not Connect Internet')
-      }
-      },[]);
-   }
-
-
-    const deletePost=()=>{
+        fetch(Constant.BaseUrl+'posts/'+id, {
+        method: 'GET',
+        headers: {
+        Accept: 'application/json',
+        'Content-Type': 'application/json',
+        },
+        })
+        .then((response) => {
+        setProgressVisible(false)
+        if(response.status==200){
+        response.json()
+        .then((responseJson) => {
+            console.log('1111111111'+JSON.stringify(responseJson))
+                  setId(responseJson.id)
+                  setTitle(responseJson.title),
+                  setBody(responseJson.body)
+        setProgressVisible(false)
+        }).catch((error) =>
+        {
+        setProgressVisible(false)
+        console.error("error"+error);
+        }
+        );
+        }
+        })
+        }else{
+        alert('Could Not Connect Internet')
+        }
+        });
+    },[]);
+    const deleteItem=()=>{
+        console.log('-------------------');
         NetInfo.fetch().then(state => {
         console.log("Connection type", state.type);
         console.log("Is connected?", state.isConnected);
@@ -86,7 +86,7 @@ const DeletePost =()=> {
         .then((responseJson) => {
 
             console.log("response"+""+JSON.stringify(responseJson))
-        setProgressVisible(true)
+        setProgressVisible(false)
         setVisible(true)
         }).catch((error) =>
         {
@@ -103,17 +103,15 @@ const DeletePost =()=> {
     }
     const ok=()=>{
          setVisible(false)
-         props.navigation.navigate('PostComment')
+         navigation.navigate('PostComment')
         }
-
-
     return (
         <View style={styles.MainContainer}>
             {/* BEGIN TO SETUP HEADER VIEW */}
             <Header androidStatusBarColor={"#D22E2E"} style={styles.header}>
               {/* BEGIN TO SETUP LEFT VIEW */}
                 <Left style={styles.left}>
-                  <TouchableOpacity style={styles.back_arrow} onPress={()=> props.navigation.goBack()}>
+                  <TouchableOpacity style={styles.back_arrow} onPress={()=> navigation.goBack()}>
                     <FontAwesome name="angle-left" size={30} color="white" style={{paddingRight: 20}}/>
                   </TouchableOpacity>
                 </Left>
@@ -127,8 +125,9 @@ const DeletePost =()=> {
 
               {/* BEGIN TO SETUP RIGHT VIEW */}
                 <Right style={styles.right}></Right>
-              {/* END TO SETUP RIGHT VIEW */}
+                {/* END TO SETUP RIGHT VIEW */}
             </Header>
+
             <View style={{flex:1,flexDirection:'row',justifyContent:'center'}}>
                 <View style={{flex:3,flexDirection:'column'}}>
                     <Text style={styles.text_head}>Id :{id}</Text>
@@ -136,7 +135,7 @@ const DeletePost =()=> {
                     <Text numberOfLines={1} style={styles.text_comments}>Body: {body}</Text>
                 </View>
                 <View style={{flex:1,flexDirection:'column',alignItems:'center'}}>
-                <TouchableOpacity style={styles.item} onPress={deletePost}>
+                <TouchableOpacity style={styles.item} onPress={deleteItem}>
                     <Image
                     style={styles.stretch}
                     source={deleteIcon}
@@ -147,7 +146,7 @@ const DeletePost =()=> {
             <Dialog
                   dialogStyle={{width:'75%',height:'35%',justifyContent: 'center',backgroundColor:'#d1d3d1'}}
                   visible={visible}
-                  onTouchOutside={() => {setVisible(false) );}}
+
                   >
                   <View style={{flex:1,flexDirection:'column',alignItems:'center',justifyContent:'center'}}>
                        <Text>Successfully delete post </Text>
@@ -162,11 +161,11 @@ const DeletePost =()=> {
               title="Progress Dialog"
               message="Please wait..."
               animationType={"fade"}
-          />
+            />
         </View>
     )
-
 }
+
 
 const styles = StyleSheet.create({
   MainContainer :{

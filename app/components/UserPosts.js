@@ -1,5 +1,5 @@
 import React, {useState, useEffect} from 'react';
-import {Alert,View,Image,ImageBackground,Dimensions,Text,FlatList,TouchableOpacity, Button,StyleSheet, Linking ,I18nManager} from 'react-native';
+import {Alert,View,Image,ImageBackground,Dimensions,Text,FlatList,TouchableOpacity,StyleSheet} from 'react-native';
 import { Content,Container, Right, Header, Left, Body} from 'native-base';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import NetInfo from "@react-native-community/netinfo";
@@ -59,6 +59,7 @@ const UserPost = (props) => {
     },[]);
 
        const viewComments=(item)=>{
+            console.log('------------'+item)
             props.navigation.navigate('PostComment',{id:item.id})
         }
 
@@ -90,7 +91,7 @@ const UserPost = (props) => {
                           cardMaxElevation={10}
                           cornerRadius={5}
                           style={{margin:5}}>
-                            <TouchableOpacity style={styles.item} onPress={viewComments(item)}>
+                            <TouchableOpacity style={styles.item} onPress={()=>{viewComments(item)}}>
                                 <View style={{flexDirection:'column'}}>
                                     <Text numberOfLines={1} style={styles.text_head}>Id : {item.id}</Text>
                                     <Text numberOfLines={1} style={styles.text_comments}>Title : {item.title}</Text>

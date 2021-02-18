@@ -1,13 +1,12 @@
 import React, {useState, useEffect} from 'react';
-import {Alert,View,Image,ImageBackground,Dimensions,Text,FlatList,TouchableOpacity, Button,StyleSheet, Linking ,I18nManager} from 'react-native';
-import { Content,Container, Right, Header, Left, Body} from 'native-base';
+import {Alert,View,Image,Dimensions,Text,FlatList,TouchableOpacity,StyleSheet} from 'react-native';
+import { Right, Header, Left, Body} from 'native-base';
 import { ProgressDialog } from 'react-native-simple-dialogs';
 import NetInfo from "@react-native-community/netinfo";
 import { Constant } from '../Global/Constant/Constant.js';
 import CardView from 'react-native-cardview';
 import FontAwesome from 'react-native-vector-icons/FontAwesome';
-import { useParams } from "react-router";
-// BEGIN TO SETUP FONT-TYPE AND FONTSIZE
+
 const guidelineBaseWidth = 350;
 const guidelineBaseHeight = 680;
 const scale = size => (Dimensions.get("window").width / guidelineBaseWidth) * size;
@@ -17,21 +16,21 @@ const font_type = {
     FontLight: 'Helvetica',
     FontBold : 'Helvetica-Bold'
 };
-const PostComment =(navigation) => {
+const PostComment =({route,navigation}) => {
   const [progressVisible, setProgressVisible] = useState(false);
   const [data, setData] = useState([]);
   const [title, setTitle] = useState(" ");
 
-  const id = navigation.getParam('id');
+  const id = route.params.id;
   useEffect(()=>{
 
-    console.log(id)
+    console.log('-------------------'+JSON.stringify(id))
     NetInfo.fetch().then(state => {
     console.log("Connection type", state.type);
     console.log("Is connected?", state.isConnected);
     if(state.isConnected){
     setProgressVisible(true)
-    fetch(Constant.BaseUrl+'posts/'+ params.id +'/comments', {
+    fetch(Constant.BaseUrl+'posts/'+ id +'/comments', {
     method: 'GET',
     headers: {
     Accept: 'application/json',
@@ -58,28 +57,12 @@ const PostComment =(navigation) => {
     alert('Could Not Connect Internet')
     }
     });
-  },[params])
-//    static navigationOptions = {
-//        header:  null
-//    }
-//    constructor(props, context) {
-//    super(props, context)
-//        this.state = {
-//            progressVisible:false,
-//            data:[],
-//            title:'',
-//        };
-//        this.params = this.props.navigation.state.params;
-//        this.showComments(this.params.id);
-//        this.setState({title:this.params.title})
-//   }
+  },[])
 
-    const showComments=(id)=>{
 
-        }
-        const viewComments=(item)=>{
-            props.navigation.navigate('DeletePost',{id:item.id})
-        }
+    const viewComments=(item)=>{
+        navigation.navigate('DeletePost',{id:item.id})
+    }
 
 
     return (
@@ -88,7 +71,7 @@ const PostComment =(navigation) => {
             <Header androidStatusBarColor={"#D22E2E"} style={styles.header}>
               {/* BEGIN TO SETUP LEFT VIEW */}
                 <Left style={styles.left}>
-                  <TouchableOpacity style={styles.back_arrow} onPress={()=> this.props.navigation.goBack()}>
+                  <TouchableOpacity style={styles.back_arrow} onPress={()=> navigation.goBack()}>
                     <FontAwesome name="angle-left" size={30} color="white" style={{paddingRight: 20}}/>
                   </TouchableOpacity>
                 </Left>
@@ -113,7 +96,7 @@ const PostComment =(navigation) => {
                           cardMaxElevation={10}
                           cornerRadius={5}
                           style={{margin:5}}>
-                            <TouchableOpacity style={styles.item} onPress={viewComments(item)}>
+                            <TouchableOpacity style={styles.item} onPress={()=>{viewComments(item)}}>
                                 <View style={{flexDirection:'column'}}>
                                     <Text style={styles.text_head}>Id : {item.id}</Text>
                                     <Text numberOfLines={1} style={styles.text_comments}>Name : {item.name}</Text>
